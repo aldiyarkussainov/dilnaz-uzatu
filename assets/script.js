@@ -163,6 +163,41 @@ if (audio) {
   });
 }
 
+/* Авто-пауза музыки когда вкладка/приложение уходят в фон.
+   Когда пользователь возвращается — возобновляем, но только
+   если до сворачивания музыка играла (не вручную поставлена на паузу). */
+let wasPlayingBeforeHide = false;
+
+document.addEventListener("visibilitychange", () => {
+  if (!audio) return;
+  if (document.hidden) {
+    wasPlayingBeforeHide = !audio.paused;
+    if (wasPlayingBeforeHide) audio.pause();
+  } else {
+    if (wasPlayingBeforeHide && audio.paused) {
+      audio.play().catch(() => {
+        musicToggle.classList.add("is-muted");
+      });
+    }
+  }
+});
+
+// pagehide — мобильные браузеры при свайпе на главный экран,
+// блокировке телефона и т.п. Гарантированно ставим на паузу.
+window.addEventListener("pagehide", () => {
+  if (audio && !audio.paused) {
+    wasPlayingBeforeHide = true;
+    audio.pause();
+  }
+});
+
+// pageshow возвращается из bfcache — возобновляем если играло
+window.addEventListener("pageshow", () => {
+  if (wasPlayingBeforeHide && audio && audio.paused && !document.hidden) {
+    audio.play().catch(() => {});
+  }
+});
+
 /* ─── 4. FLORAL FALLBACK (SVG → PNG → hide) ───────────────── */
 
 // HTML asks for .svg first. If the file is missing, swap to .png.
