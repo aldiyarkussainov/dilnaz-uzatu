@@ -100,18 +100,42 @@ if (scrollCue) {
 }
 
 // Music starts on the first user gesture (browsers block autoplay
-// without one). We listen once to click + touchstart and try then.
+// without one). Listeners остаются на месте до тех пор, пока play()
+// не отработает успешно — иначе любая неудачная попытка (например,
+// при выходе preload) сжигала единственный шанс.
 let musicStarted = false;
+const MUSIC_GESTURE_EVENTS = ["pointerdown", "click", "touchstart", "touchend", "keydown", "wheel"];
+
+function detachMusicGestureListeners() {
+  MUSIC_GESTURE_EVENTS.forEach((ev) => {
+    document.removeEventListener(ev, tryStartMusic);
+  });
+}
+
 function tryStartMusic() {
   if (musicStarted || !audio) return;
-  musicStarted = true;
   audio.volume = 0.45;
-  audio.play()
-    .then(() => musicToggle.classList.remove("is-muted"))
-    .catch(() => musicToggle.classList.add("is-muted"));
+  const p = audio.play();
+  if (!p || typeof p.then !== "function") {
+    // Очень старые браузеры: play() ничего не вернул — считаем успехом
+    musicStarted = true;
+    musicToggle.classList.remove("is-muted");
+    detachMusicGestureListeners();
+    return;
+  }
+  p.then(() => {
+    musicStarted = true;
+    musicToggle.classList.remove("is-muted");
+    detachMusicGestureListeners();
+  }).catch(() => {
+    // Браузер заблокировал autoplay — оставляем listener'ы и muted-state
+    // чтобы следующий жест юзера ещё раз попробовал.
+    musicToggle.classList.add("is-muted");
+  });
 }
-["pointerdown", "click", "touchstart", "touchend", "keydown", "wheel"].forEach((ev) => {
-  document.addEventListener(ev, tryStartMusic, { once: true, passive: true });
+
+MUSIC_GESTURE_EVENTS.forEach((ev) => {
+  document.addEventListener(ev, tryStartMusic, { passive: true });
 });
 
 /* Music toggle — manual play/pause */
