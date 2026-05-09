@@ -1,0 +1,1819 @@
+/* ============================================================
+   Дильназ — Қыз ұзату
+   Design tokens & global styles
+   Rules: 1 brand color (gold) + greys + 3-tone neutral surfaces,
+          ≤2 radii, ≤4 font-sizes,
+          ease-out only (180–700ms), no nested cards,
+          no decorative icon-boxes, no gradients.
+   ============================================================ */
+
+/* Custom calligraphy font.
+   Положи файл как assets/fonts/script.woff2 (или .woff / .ttf / .otf)
+   — браузер подхватит сам. Если файла нет, страница использует
+   Google-шрифт Pinyon Script как fallback. */
+@font-face {
+  font-family: 'BrideScript';
+  src: url('fonts/script.woff2') format('woff2'),
+       url('fonts/script.woff')  format('woff'),
+       url('fonts/script.ttf')   format('truetype'),
+       url('fonts/script.otf')   format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Second calligraphy — KZ Balmoral (поддерживает казахские буквы
+   Қ, Ң, Ғ, Ү, Ұ, Ө, Ә, І). Используется только для имён, чтобы
+   они не «ломались» как в обычной BrideScript.
+   Положи файл как assets/fonts/kzbalmoral_regular.{woff2|woff|ttf|otf}. */
+@font-face {
+  font-family: 'KZBalmoral';
+  src: url('fonts/kzbalmoral_regular.woff2') format('woff2'),
+       url('fonts/kzbalmoral_regular.woff')  format('woff'),
+       url('fonts/kzbalmoral_regular.ttf')   format('truetype'),
+       url('fonts/kzbalmoral_regular.otf')   format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Surface hierarchy — two calm neutrals + dark accent */
+  --bg:            #FBF4EA;  /* page background, warm cream */
+  --surface-cream: #FBF4EA;  /* alias kept for backwards-compat */
+  --surface-dark:  #473436;  /* deep brown block */
+
+  /* Brand — full tonal range for wax/metal effects */
+  --brand:         #B8975A;
+  --brand-soft:    #D4B57E;
+  --brand-deep:    #8E7140;
+  --brand-deepest: #6B5028;
+
+  /* Text — light surfaces */
+  --ink:           #1A1A1A;
+  --text-primary:  #2C2C2C;
+  --text-secondary:#6B6B6B;
+  --text-tertiary: #9A9A9A;
+
+  /* Text — dark surfaces */
+  --text-on-dark:      #FBF4EA;
+  --text-on-dark-soft: rgba(251, 244, 234, 0.65);
+
+  /* Borders */
+  --border:        #E8E2D7;
+  --border-strong: #CFC6B5;
+  --border-on-dark:rgba(251, 244, 234, 0.14);
+
+  /* Status — semantic only */
+  --success:         #2D7A4F;
+  --success-on-dark: #9DD7B5;
+  --error:           #A33B3B;
+  --error-on-dark:   #E9A4A4;
+
+  /* Envelope-only tones — deep-red paper shell, cream wax seal */
+  --envelope-shell:      #B02A38;  /* deep crimson body + flap */
+  --envelope-shell-edge: #891E2A;  /* darker red for the V edge */
+
+  /* Cream wax seal — built from --bg + lighter highlight + darker rim */
+  --seal-highlight: #FFFAF5;
+  --seal-base:      var(--bg);
+  --seal-edge:      #DCC9CE;
+  --seal-deep:      #B5A0A6;
+
+  /* Paper-grain noise — used as a multiply overlay on envelope
+     surfaces so they read as paper, not flat fill. */
+  --paper-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+
+  /* Filled gold heart — used as the "today" cell marker in the calendar */
+  --heart-gold: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23B8975A' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E");
+
+  /* Radii — only two */
+  --radius-sm: 6px;
+  --radius-md: 14px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1); /* ease-out */
+  --t-ui: 180ms;
+  --t-section: 420ms;
+  --t-narrative: 700ms;
+
+  /* Type scale — only four sizes */
+  --fs-display: clamp(3.4rem, 14vw, 6.25rem);
+  --fs-h2:      clamp(1.35rem, 4.4vw, 1.875rem);
+  --fs-body:    1rem;
+  --fs-caption: 0.75rem;
+
+  /* Layout */
+  --max-w: 560px;
+  --pad-x: clamp(1.25rem, 5vw, 2rem);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* (legacy: closed-state rules removed — page is fully scrollable from start) */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ============================================================
+   PRELOAD splash
+   Brief intro screen — cream background, dark heart in the
+   center — fades out once the page is interactive.
+   ============================================================ */
+
+.preload {
+  position: fixed;
+  inset: 0;
+  background: var(--surface-cream);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  /* Perspective so the heart-burst feels like it comes towards
+     the viewer ("уходит вперёд") rather than just growing flat */
+  perspective: 1200px;
+}
+
+/* Loading state — heart beats */
+.preload-heart {
+  width: 64px;
+  height: 64px;
+  color: var(--surface-dark);
+  /* Two stacked animations:
+     - preload-in animates opacity only (entrance fade)
+     - heartbeat animates transform only (continuous lub-dub) */
+  animation:
+    preload-in 420ms var(--ease) both,
+    heartbeat 1.3s var(--ease) infinite;
+}
+@keyframes preload-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes heartbeat {
+  0%, 28%, 70%, 100% { transform: scale(1); }
+  14% { transform: scale(1.18); } /* lub — strong beat */
+  42% { transform: scale(1.10); } /* dub — softer beat */
+}
+
+/* Exit state — heart anticipates, then bursts forward,
+   preload bg fades out a beat later, revealing the invitation. */
+.preload.is-exiting {
+  pointer-events: none;
+  animation: preload-out 700ms 350ms var(--ease) forwards;
+}
+.preload.is-exiting .preload-heart {
+  /* override running animations entirely */
+  animation: heart-burst 950ms cubic-bezier(0.34, 0, 0.64, 1) forwards;
+}
+
+@keyframes preload-out {
+  to { opacity: 0; }
+}
+
+@keyframes heart-burst {
+  0%   { transform: scale(1)    translateZ(0);     opacity: 1; }
+  18%  { transform: scale(0.84) translateZ(-30px); opacity: 1; } /* anticipation */
+  55%  { transform: scale(6)    translateZ(60px);  opacity: 0.55; }
+  100% { transform: scale(22)   translateZ(120px); opacity: 0; }
+}
+
+/* ============================================================
+   COVER (envelope screen)
+   ============================================================ */
+
+.cover {
+  position: relative;
+  min-height: 100dvh;
+  min-height: 100vh;
+  /* Flex with flex-end — name+subtitle сдвинуты вниз (район рук
+     на портрете), визуально собираются в один блок с cover-foot
+     (датой + scroll-cue). Foot позиционирован absolute снизу. */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: center;
+  padding: 0 var(--pad-x);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: clamp(9rem, 22vh, 12rem);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* Full-bleed bride photo as background, perfectly centered.
+   Hidden initially — fades in once preload exits. */
+.cover-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: -2;
+  user-select: none;
+  -webkit-user-drag: none;
+  opacity: 0;
+  transition: opacity 1300ms var(--ease);
+}
+body.cover-revealed .cover-photo { opacity: 1; }
+
+/* Darker scrim — heavier overall so text reads on any photo */
+.cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(0, 0, 0, 0.60) 0%,
+    rgba(0, 0, 0, 0.40) 35%,
+    rgba(0, 0, 0, 0.42) 65%,
+    rgba(0, 0, 0, 0.72) 100%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Decorative double border — two thin cream lines hugging
+   the cover, classic wedding-invite frame */
+.cover-frame {
+  position: absolute;
+  inset: 1.1rem;
+  border: 1px solid rgba(251, 244, 234, 0.6);
+  pointer-events: none;
+  z-index: 1;
+}
+.cover-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0.4rem;
+  border: 1px solid rgba(251, 244, 234, 0.4);
+}
+
+.cover-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Tight visual rhythm — script font already has descender air,
+     so a small gap reads ~24px optically. */
+  gap: 4px;
+  width: 100%;
+  max-width: var(--max-w);
+}
+
+/* Cover text + foot start hidden — staggered reveal once preload
+   has finished and body.cover-revealed is added. */
+.cover-name,
+.cover-subtitle {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 800ms var(--ease),
+    transform 800ms var(--ease);
+}
+/* .cover-foot is absolute + already uses translateX(-50%) for
+   horizontal centering — combine both translates so it animates
+   straight up from below instead of slamming back to left:50%. */
+.cover-foot {
+  opacity: 0;
+  transform: translate(-50%, 20px);
+  transition:
+    opacity 800ms var(--ease),
+    transform 800ms var(--ease);
+}
+
+body.cover-revealed .cover-name {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 600ms;
+}
+body.cover-revealed .cover-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 850ms;
+}
+body.cover-revealed .cover-foot {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: 1100ms;
+}
+
+.cover-name {
+  font-family: 'BrideScript', 'Pinyon Script', 'Cormorant Garamond', serif;
+  font-size: 115px;
+  color: var(--surface-cream);
+  margin: 0;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  text-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.50),
+    0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+.cover-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.42em;
+  color: var(--surface-cream);
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 10px rgba(0, 0, 0, 0.55),
+    0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ─── COVER FOOT (date + scroll cue at the bottom) ─── */
+
+.cover-foot {
+  position: absolute;
+  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  pointer-events: none;
+}
+.cover-foot > * { pointer-events: auto; }
+
+.cover-date {
+  /* Same treatment as QYZ UZATU — twins for visual symmetry */
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.42em;
+  color: var(--surface-cream);
+  margin: 0;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 10px rgba(0, 0, 0, 0.55),
+    0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Designer scroll cue — thin vertical line with a falling dot */
+.scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--surface-cream);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+}
+.scroll-cue.is-visible { opacity: 0.9; }
+
+.scroll-cue-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-cue-line {
+  position: relative;
+  width: 1px;
+  height: 56px;
+  background: rgba(251, 244, 234, 0.32);
+  overflow: hidden;
+}
+.scroll-cue-line::before {
+  content: "";
+  position: absolute;
+  left: -1.5px;
+  top: -10px;
+  width: 4px;
+  height: 10px;
+  background: var(--surface-cream);
+  border-radius: 2px;
+  animation: scroll-drop 2.2s ease-in-out infinite;
+}
+
+@keyframes scroll-drop {
+  0%   { top: -10px; opacity: 0; }
+  18%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { top: 56px;  opacity: 0; }
+}
+
+/* ============================================================
+   ENVELOPE
+   Layered structure: back rectangle, front (lower) rectangle,
+   triangular flap on top, wax seal at flap tip.
+   ============================================================ */
+
+.envelope {
+  position: relative;
+  display: block;
+  width: min(94%, 460px);
+  margin: 0 auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  animation: envelope-bob 2.6s ease-in-out infinite;
+  transition:
+    opacity var(--t-narrative) var(--ease),
+    transform var(--t-narrative) var(--ease);
+}
+
+/* Image-based envelope — replaces all the CSS layers */
+.envelope-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-md);
+  filter: drop-shadow(0 18px 32px rgba(80, 18, 28, 0.32));
+  transition: transform var(--t-ui) var(--ease);
+}
+.envelope:hover .envelope-img { transform: translateY(-2px); }
+.envelope:active .envelope-img { transform: translateY(0); }
+.envelope:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 6px;
+  border-radius: var(--radius-md);
+}
+
+/* Open state — fade + slight lift instead of the old flap rotation */
+body:not(.closed) .envelope {
+  opacity: 0;
+  transform: translateY(-12px) scale(0.96);
+  pointer-events: none;
+  animation: none;
+}
+
+.envelope:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 6px;
+  border-radius: var(--radius-md);
+}
+
+@keyframes envelope-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* Envelope body — dark paper with subtle grain + edge depth */
+.envelope-back {
+  position: absolute;
+  inset: 0;
+  background: var(--envelope-shell);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow:
+    0 18px 44px -20px rgba(80, 18, 28, 0.50),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.28);
+}
+.envelope-back::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--paper-noise);
+  background-size: 220px 220px;
+  mix-blend-mode: overlay;
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+/* Slightly larger triangle behind the flap — peeks out as the
+   darker V edge that gives the envelope its depth. */
+.envelope-flap-shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(60% + 10px);
+  background: var(--envelope-shell-edge);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  z-index: 1;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  transition: opacity var(--t-section) var(--ease);
+}
+
+/* Triangular flap — folded down (closed state) */
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: var(--envelope-shell);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0%;
+  transition: transform var(--t-narrative) var(--ease),
+              opacity calc(var(--t-narrative) - 200ms) calc(var(--t-narrative) - 400ms) var(--ease);
+  z-index: 2;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.envelope-flap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--paper-noise);
+  background-size: 220px 220px;
+  mix-blend-mode: overlay;
+  opacity: 0.36;
+  pointer-events: none;
+}
+
+/* Wax seal at flap tip — cream wax (matches page bg), with
+   irregular blob silhouette, soft radial gradient for material
+   depth, and an embossed heart pressed into it. */
+.envelope-seal {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  width: 86px;
+  height: 86px;
+  display: grid;
+  place-items: center;
+  /* organic wax silhouette */
+  border-radius: 48% 52% 47% 53% / 51% 49% 51% 49%;
+  background:
+    radial-gradient(circle at 32% 30%,
+      var(--seal-highlight) 0%,
+      var(--seal-base)     32%,
+      var(--seal-edge)     78%,
+      var(--seal-deep)    100%);
+  box-shadow:
+    0 6px 14px -3px rgba(140, 110, 115, 0.45),
+    inset 0 1px 2px rgba(255, 255, 255, 0.65),
+    inset 0 -3px 5px rgba(120, 95, 100, 0.30);
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  transition: transform var(--t-section) var(--ease),
+              opacity var(--t-section) var(--ease);
+}
+
+/* Embossed heart inside the seal — uses currentColor + double
+   drop-shadow (light highlight + dark shadow) for a pressed-in
+   stamped feel. */
+.seal-heart {
+  width: 38px;
+  height: 38px;
+  color: var(--seal-deep);
+  filter:
+    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.55))
+    drop-shadow(0 -1px 1px rgba(70, 40, 45, 0.35));
+}
+
+/* Open state */
+body:not(.closed) .envelope-flap {
+  transform: rotateX(-180deg);
+  opacity: 0;
+}
+body:not(.closed) .envelope-flap-shadow {
+  opacity: 0;
+}
+body:not(.closed) .envelope-seal {
+  transform: translate(-50%, -50%) scale(0.55);
+  opacity: 0;
+}
+body:not(.closed) .envelope {
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+
+/* ============================================================
+   COVER FLORALS (PNG decoration)
+   ============================================================ */
+
+/* Florals act as background corner accents — top anchored to
+   top-LEFT, bottom anchored to bottom-RIGHT, both bleed off
+   their respective edges to feel like decoration peeking in. */
+.cover-floral {
+  position: absolute;
+  width: 110%;
+  max-width: 1200px;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  z-index: 0;
+  opacity: 0.95;
+}
+.cover-floral--top {
+  top: -10%;
+  left: -45%;
+  /* mirrored copy of --bottom (point reflection — no transform
+     since bottom is already rotated 180°) */
+  width: 175%;
+  max-width: 2000px;
+}
+.cover-floral--bottom {
+  bottom: -10%;
+  right: -38%;
+  /* override base size — bottom is intentionally larger */
+  width: 160%;
+  max-width: 1800px;
+  transform: scaleX(-1) scaleY(-1);
+}
+
+/* ============================================================
+   SCROLL HINT
+   ============================================================ */
+
+/* (legacy .scroll-hint removed — replaced by .scroll-cue above) */
+
+/* ============================================================
+   PAGES (revealed after envelope is opened)
+   Section colors alternate via modifier classes.
+   ============================================================ */
+
+.page {
+  min-height: 100dvh;
+  min-height: 100vh;
+  padding: clamp(3.5rem, 12vh, 5.5rem) var(--pad-x);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--bg);
+
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--t-section) var(--ease),
+    transform var(--t-section) var(--ease);
+}
+.page.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page > * { max-width: var(--max-w); width: 100%; }
+.page > .bride-photo { width: auto; }
+
+/* Section colors */
+.page--cream { background: var(--surface-cream); }
+.page--dark  { background: var(--surface-dark); color: var(--text-on-dark); }
+.page--bg    { background: var(--bg); }
+
+/* ─── GREETING SECTION (page--greeting) ─── */
+
+/* Layout: content split into a top group (intro + name + lead)
+   and a bottom group (signature + names) pushed against the
+   section's bottom — bottom group sits next to the screen below. */
+.page--greeting {
+  position: relative;
+  z-index: 2;
+  justify-content: space-between;
+  padding-top:    clamp(3.5rem, 10vh, 5rem);
+  padding-bottom: clamp(2.5rem, 8vh,  4rem);
+  /* Kill the page-level reveal animation — it caused a stretching
+     feel on scroll. Per-element stagger handles the reveal. */
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.greeting-top,
+.greeting-middle,
+.greeting-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.page--greeting .eyebrow {
+  font-size: 0.85rem;
+  /* Прижат к "Сіздерді аяулы" — читаются как одна группа */
+  margin: 0 0 0.5rem;
+}
+.page--greeting .display-name {
+  font-size: clamp(5.5rem, 25vw, 10rem);
+  margin: 0 0 0.4rem;
+}
+.page--greeting .lead {
+  font-size: clamp(1.55rem, 5.2vw, 2.4rem);
+  line-height: 1.4;
+  margin: 0;
+  /* Browser balances lines — no orphan single-word line at the end */
+  text-wrap: balance;
+  max-width: 24ch;
+}
+/* Pre-name lead inside .greeting-top — gap до имени теперь
+   создаётся за счёт justify-content: space-between на секции,
+   margin тут не нужен. */
+.page--greeting .greeting-top .lead {
+  margin: 0;
+}
+/* Post-name lead — main body of the sentence, after the heart */
+.page--greeting .lead:last-of-type {
+  margin: 0;
+}
+/* Single-line signature: «Құрметпен, Той иелері» */
+.page--greeting .signature {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-style: normal;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0 0 0.85rem;
+}
+.page--greeting .hosts-names {
+  /* Sans-serif Gilroy treatment — caps + tracking */
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.5rem, 5.5vw, 2.4rem);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--ink);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin: 0.5rem 0 0;
+}
+
+/* Hero heart between Дильназ and the post-lead text */
+.page--greeting .hero-heart {
+  width: 26px;
+  height: 26px;
+  color: var(--surface-dark);
+  margin: 0.4rem 0 1rem;
+  align-self: center;
+}
+
+/* Background — falling hearts (populated by script.js).
+   Generic — works on any .page that contains a .falling-hearts. */
+.page > .falling-hearts {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.falling-heart {
+  position: absolute;
+  top: -8%;
+  display: block;
+  color: var(--surface-dark);
+  animation: heart-fall linear infinite;
+  will-change: transform;
+}
+.falling-heart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+@keyframes heart-fall {
+  0%   { transform: translateY(0)     rotate(-6deg); }
+  100% { transform: translateY(118vh) rotate(8deg); }
+}
+
+/* Stagger reveal — every text block in the three groups slides
+   + fades in with a small delay when the section enters viewport. */
+.greeting-top > *,
+.greeting-middle > *,
+.greeting-bottom > * {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 700ms var(--ease),
+    transform 700ms var(--ease);
+}
+.page--greeting.is-visible .greeting-top > *,
+.page--greeting.is-visible .greeting-middle > *,
+.page--greeting.is-visible .greeting-bottom > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+.page--greeting.is-visible .greeting-top    > *:nth-child(1) { transition-delay:  80ms; } /* eyebrow */
+.page--greeting.is-visible .greeting-top    > *:nth-child(2) { transition-delay: 200ms; } /* lead pre */
+.page--greeting.is-visible .greeting-middle > *:nth-child(1) { transition-delay: 340ms; } /* display-name */
+.page--greeting.is-visible .greeting-middle > *:nth-child(2) { transition-delay: 460ms; } /* hero-heart */
+.page--greeting.is-visible .greeting-middle > *:nth-child(3) { transition-delay: 580ms; } /* lead post */
+.page--greeting.is-visible .greeting-bottom > *:nth-child(1) { transition-delay: 720ms; } /* signature */
+.page--greeting.is-visible .greeting-bottom > *:nth-child(2) { transition-delay: 840ms; } /* hosts-names */
+
+/* (decorative arches removed by request) */
+
+/* Eyebrow */
+.eyebrow {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin: 0 0 1.5rem;
+  font-weight: 500;
+}
+.page--dark .eyebrow { color: var(--brand-soft); }
+
+/* Display name */
+.display-name {
+  font-family: 'BrideScript', 'Pinyon Script', serif;
+  font-size: var(--fs-display);
+  color: var(--ink);
+  margin: 0 0 1.5rem;
+  line-height: 1;
+  font-weight: 400;
+}
+.page--dark .display-name { color: var(--text-on-dark); }
+
+/* Lead paragraph */
+.lead {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: 0 0 2rem;
+  line-height: 1.5;
+}
+.lead strong { font-weight: 500; color: var(--ink); }
+.page--dark .lead { color: var(--text-on-dark); }
+.page--dark .lead strong { color: #fff; }
+
+.signature {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0;
+}
+.page--dark .signature { color: var(--text-on-dark-soft); }
+
+/* ============================================================
+   BRIDE PHOTO
+   ============================================================ */
+
+.bride-photo {
+  position: relative;
+  margin: 0 0 2rem;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--bg);
+}
+.bride-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bride-photo--small {
+  max-width: 220px;
+  aspect-ratio: 4 / 5;
+  margin: 2.5rem 0 0;
+}
+
+/* ============================================================
+   CALENDAR
+   ============================================================ */
+
+/* Calendar — flat (no card frame), bigger numbers, line under
+   the day-of-week row, gold heart on "today". */
+.calendar {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 0 1.5rem;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.calendar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 400;            /* совпадает с цифрами календаря */
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+.calendar-head span:first-child { text-transform: lowercase; }
+.page--dark .calendar-head { color: var(--text-on-dark); }
+
+/* Day-of-week row + line under it */
+.calendar-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border);
+}
+.calendar-dow > span {
+  text-align: center;
+}
+.page--dark .calendar-dow {
+  color: var(--text-on-dark-soft);
+  border-bottom-color: rgba(251, 244, 234, 0.25);
+}
+
+/* Day numbers — bigger, tighter row gap */
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.1rem 0;
+  font-size: clamp(1.05rem, 3.6vw, 1.35rem);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.calendar-days > span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+}
+.calendar-days .muted { visibility: hidden; }
+
+/* "Today" cell — filled gold heart that gently pulses.
+   Heart lives in ::before so the number stays static while
+   only the heart scales. */
+.calendar-days .today {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 0;
+}
+.calendar-days .today::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--heart-gold) center / contain no-repeat;
+  z-index: -1;
+  transform-origin: center;
+  animation: heart-pulse-cell 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes heart-pulse-cell {
+  0%, 100% { transform: scale(1);    opacity: 0.95; }
+  50%      { transform: scale(1.15); opacity: 1;    }
+}
+
+.page--dark .calendar-days        { color: var(--text-on-dark); }
+.page--dark .calendar-days .today { color: var(--surface-dark); }
+
+/* Date page — dark section with two cream half-circle "cutouts"
+   straddling top and bottom edges. z-index lifts the section
+   above the cream-coloured siblings so the pseudo-circles paint
+   on top of them, creating the illusion of a notch. */
+.page--date {
+  position: relative;
+  z-index: 10;
+  /* Page-level translateY animation is disabled — children
+     stagger in instead, just like on the greeting screen. */
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+.page--date::before,
+.page--date::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: clamp(80px, 18vw, 140px);
+  height: clamp(80px, 18vw, 140px);
+  background: var(--surface-cream);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+}
+.page--date::before { top: 0;    transform: translate(-50%, -50%); }
+.page--date::after  { bottom: 0; transform: translate(-50%,  50%); }
+
+/* Stagger reveal for date page (eyebrow → calendar → time-row) */
+.page--date > * {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 700ms var(--ease),
+    transform 700ms var(--ease);
+}
+.page--date.is-visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+.page--date.is-visible > *:nth-child(1) { transition-delay: 100ms; }
+.page--date.is-visible > *:nth-child(2) { transition-delay: 260ms; }
+.page--date.is-visible > *:nth-child(3) { transition-delay: 460ms; }
+
+/* Time block — caps label на вершине, золотая линия по всей
+   ширине, крупное script-время снизу. */
+.time-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.85rem;
+  margin-top: 2.5rem;
+}
+.time-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-on-dark-soft);
+  margin: 0;
+  white-space: nowrap;
+}
+.time-line {
+  width: 100%;
+  height: 1px;
+  background: var(--brand);
+  border: 0;
+  margin: 0;
+}
+.time-value {
+  font-family: 'BrideScript', 'Pinyon Script', 'Cormorant Garamond', serif;
+  font-size: clamp(5rem, 20vw, 9rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--brand);
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   COUNTDOWN
+   ============================================================ */
+
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 360px;
+  margin: 2.25rem 0 0;
+}
+.countdown-cell {
+  display: grid;
+  gap: 0.4rem;
+  text-align: center;
+  padding: 0.75rem 0.4rem 0.65rem;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.page--dark .countdown-cell {
+  background: rgba(251, 244, 234, 0.05);
+  border-color: var(--border-on-dark);
+}
+
+.countdown-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+.page--dark .countdown-num { color: var(--text-on-dark); }
+
+.countdown-label {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+.page--dark .countdown-label { color: var(--text-on-dark-soft); }
+
+.countdown-passed {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-h2);
+  margin: 1.5rem 0 0;
+  color: var(--brand);
+}
+
+/* ============================================================
+   VENUE
+   ============================================================ */
+
+/* Default venue rules (kept for any other pages that might reuse) */
+.venue-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-h2);
+  color: var(--ink);
+  font-weight: 500;
+  margin: 0 0 0.4rem;
+}
+.venue-address {
+  font-size: var(--fs-body);
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+}
+
+/* ─── VENUE PAGE — restyled per latest brief ─── */
+
+.page--venue {
+  position: relative;
+  z-index: 2;
+  /* Banner mode — секция короче, без обязательного 100vh */
+  min-height: auto;
+  padding-top:    clamp(2.5rem, 8vh, 4.25rem);
+  padding-bottom: clamp(2.5rem, 8vh, 4.25rem);
+  /* Override page-level translateY animation — children stagger in. */
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Family Hall — script font, помещается в одну строку */
+.page--venue .venue-name {
+  font-family: 'BrideScript', 'Pinyon Script', 'Cormorant Garamond', serif;
+  font-size: clamp(3.2rem, 11vw, 5.5rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin: 0.5rem 0 1.75rem;
+  white-space: nowrap;
+}
+
+/* Address — caps, bigger, тонкое сжатие межбуквенное */
+.page--venue .venue-address {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1rem, 3.4vw, 1.25rem);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 0 0 3rem;
+}
+
+.page--venue .eyebrow {
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
+
+/* Pill button — fully rounded, dark brown, centred caps inscription
+   с парой пульсирующих сердечек по бокам */
+.btn-map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  background: var(--surface-dark);
+  color: var(--surface-cream);
+  border: 0;
+  border-radius: 999px;
+  padding: 1.1rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-ui) var(--ease), transform var(--t-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-map:hover  { background: #2E2123; }
+.btn-map:active { transform: translateY(1px); }
+.btn-map:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* Маленькие сердечки на кнопке — alternately pulse / glow */
+.btn-heart {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: currentColor;
+  animation: btn-heart-glow 1.8s ease-in-out infinite;
+}
+.btn-heart:last-child { animation-delay: 0.9s; }
+
+@keyframes btn-heart-glow {
+  0%, 100% { opacity: 0.35; transform: scale(0.92); }
+  50%      { opacity: 1;    transform: scale(1.10);  }
+}
+
+/* Stagger reveal — eyebrow → name → address → button.
+   .falling-hearts always visible (excluded via :not). */
+.page--venue > *:not(.falling-hearts) {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 700ms var(--ease),
+    transform 700ms var(--ease);
+}
+.page--venue.is-visible > *:not(.falling-hearts) {
+  opacity: 1;
+  transform: translateY(0);
+}
+.page--venue.is-visible > *:nth-child(2) { transition-delay: 100ms; } /* eyebrow */
+.page--venue.is-visible > *:nth-child(3) { transition-delay: 240ms; } /* venue-name */
+.page--venue.is-visible > *:nth-child(4) { transition-delay: 380ms; } /* venue-address */
+.page--venue.is-visible > *:nth-child(5) { transition-delay: 540ms; } /* btn-map */
+
+/* Buttons */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--ink);
+  color: var(--surface-cream);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1.4rem;
+  font: inherit;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-ui) var(--ease), color var(--t-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-secondary:hover { background: #000; }
+.btn-secondary:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.btn-secondary svg { transition: transform var(--t-ui) var(--ease); }
+.btn-secondary:hover svg { transform: translate(2px, -2px); }
+
+/* ============================================================
+   PROGRAM
+   ============================================================ */
+
+.program {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 320px;
+}
+.program li {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.program li:last-child { border-bottom: 0; }
+.page--dark .program li { border-bottom-color: var(--border-on-dark); }
+
+.program-time {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-h2);
+  color: var(--brand);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.page--dark .program-time { color: var(--brand-soft); }
+
+.program-title {
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+}
+.page--dark .program-title { color: var(--text-on-dark); }
+
+/* ============================================================
+   RSVP
+   ============================================================ */
+
+.rsvp-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: var(--fs-h2);
+  color: var(--ink);
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+.page--dark .rsvp-title { color: var(--text-on-dark); }
+
+.rsvp-sub {
+  color: var(--text-secondary);
+  margin: 0 0 2rem;
+}
+.page--dark .rsvp-sub { color: var(--text-on-dark-soft); }
+
+/* ─── RSVP PAGE — restyled per latest brief ─── */
+
+.page--rsvp {
+  position: relative;
+  z-index: 2;
+  /* Banner-mode — компактнее: высота по контенту, padding меньше */
+  min-height: auto;
+  padding-top:    clamp(3rem, 9vh, 4.5rem);
+  padding-bottom: clamp(3rem, 9vh, 4.5rem);
+  /* Override page-level translateY animation — children stagger in */
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.page--rsvp .eyebrow {
+  font-size: 0.95rem;
+  margin: 0 0 1rem;
+}
+
+.page--rsvp .rsvp-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 6vw, 2.8rem);
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 2rem;
+  white-space: nowrap;
+}
+
+/* Stack of guest-name fields (first one + dynamically added) */
+.guest-fields { display: grid; gap: 1rem; }
+
+/* + Тағы қонақ — простая текст-кнопка, без pill и без shimmer */
+.btn-add {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 0;
+  padding: 0.5rem 0.25rem;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand);
+  cursor: pointer;
+  transition: color var(--t-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-add:hover  { color: var(--brand-deep); }
+.btn-add:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-add-plus {
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+/* Поле гостя с кнопкой удаления */
+.input-with-remove {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+.input-with-remove input {
+  flex: 1;
+  min-width: 0;
+}
+.btn-remove {
+  flex-shrink: 0;
+  width: 2.6rem;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color var(--t-ui) var(--ease),
+    border-color var(--t-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-remove:hover {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+/* Submit-кнопка на RSVP — выглядит как .btn-map (pill, dark/cream),
+   плюс непрерывный shimmer-блик по поверхности */
+.page--rsvp .btn-primary {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 380px;
+  margin: 1.5rem auto 0;
+  background: var(--surface-dark);
+  color: var(--surface-cream);
+  border: 0;
+  border-radius: 999px;
+  padding: 1.1rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.page--rsvp .btn-primary:hover  { background: #2E2123; }
+.page--rsvp .btn-primary:active { transform: translateY(1px); }
+
+.page--rsvp .btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 220%;
+  left: -110%;
+  background: linear-gradient(
+    100deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 65%
+  );
+  pointer-events: none;
+  animation: btn-shimmer 2.6s linear infinite;
+}
+
+@keyframes btn-shimmer {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(50%); }
+}
+
+/* Two views inside the RSVP section: form (default) and
+   confirmed (shown after «Иә, келемін» submitted). Whichever
+   view is currently не [hidden] получает stagger reveal. */
+.rsvp-view {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--max-w);
+}
+.rsvp-view > * {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.page--rsvp.is-visible .rsvp-view:not([hidden]) > * {
+  animation: rsvp-fade-in 700ms var(--ease) both;
+}
+.page--rsvp.is-visible .rsvp-view:not([hidden]) > *:nth-child(1) { animation-delay: 100ms; }
+.page--rsvp.is-visible .rsvp-view:not([hidden]) > *:nth-child(2) { animation-delay: 240ms; }
+.page--rsvp.is-visible .rsvp-view:not([hidden]) > *:nth-child(3) { animation-delay: 380ms; }
+.page--rsvp.is-visible .rsvp-view:not([hidden]) > *:nth-child(4) { animation-delay: 520ms; }
+
+@keyframes rsvp-fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Compact countdown inside confirmed-view */
+.countdown--confirm {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 480px;
+  margin: 1.5rem auto 1.5rem;
+}
+.countdown--confirm .countdown-cell {
+  display: grid;
+  gap: 0.4rem;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  padding: 0.25rem 0.2rem;
+}
+.countdown--confirm .countdown-num {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(2rem, 8vw, 3.25rem);
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.countdown--confirm .countdown-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Subtle cancel link — деструктивное второстепенное действие */
+.btn-cancel {
+  display: block;
+  margin: 0.75rem auto 0;
+  background: transparent;
+  border: 0;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 0, 0, 0.18);
+  text-underline-offset: 0.35em;
+  transition: color var(--t-ui) var(--ease),
+              text-decoration-color var(--t-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-cancel:hover {
+  color: var(--error);
+  text-decoration-color: currentColor;
+}
+.btn-cancel:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.form {
+  width: 100%;
+  display: grid;
+  gap: 1.25rem;
+  text-align: left;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.field--radio { gap: 0.6rem; }
+
+.field-label {
+  font-size: var(--fs-caption);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.page--dark .field-label { color: var(--text-on-dark-soft); }
+
+.field-optional {
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--text-tertiary);
+}
+
+.field input[type="text"],
+.field input[type="number"],
+.field textarea {
+  width: 100%;
+  font: inherit;
+  font-size: var(--fs-body);
+  color: var(--text-primary);
+  background: #fff;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.875rem;
+  transition: border-color var(--t-ui) var(--ease);
+  font-family: inherit;
+}
+.field textarea { resize: vertical; min-height: 3.5rem; }
+
+.field input:focus,
+.field textarea:focus {
+  outline: 0;
+  border-color: var(--brand);
+}
+.field input::placeholder,
+.field textarea::placeholder { color: var(--text-tertiary); }
+
+.field input:invalid:not(:placeholder-shown) { border-color: var(--error); }
+
+.radio {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  transition: border-color var(--t-ui) var(--ease), background var(--t-ui) var(--ease);
+}
+.radio:hover { border-color: var(--brand-soft); }
+.radio input { accent-color: var(--brand); margin: 0; }
+.radio:has(input:checked) {
+  border-color: var(--brand);
+  background: var(--bg);
+}
+
+.btn-primary {
+  appearance: none;
+  width: 100%;
+  background: var(--ink);
+  color: #fff;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0.95rem 1rem;
+  font: inherit;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background var(--t-ui) var(--ease), transform var(--t-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-primary:hover  { background: #000; }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+
+.form-status {
+  margin: 0;
+  min-height: 1.25rem;
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  text-align: center;
+}
+.form-status.is-success { color: var(--success); }
+.form-status.is-error   { color: var(--error); }
+.page--dark .form-status            { color: var(--text-on-dark-soft); }
+.page--dark .form-status.is-success { color: var(--success-on-dark); }
+.page--dark .form-status.is-error   { color: var(--error-on-dark); }
+
+/* ============================================================
+   COUNTDOWN SCREEN — «Тойға дейін:»
+   Большой статуарный таймер. Каркас элементов оставлен от
+   старого countdown-блока, переопределяем только под этот экран.
+   ============================================================ */
+
+.page--countdown {
+  position: relative;
+  z-index: 2;
+  /* Compact "podval" — небольшая тёмная полоска, не полный экран */
+  min-height: auto;
+  padding-top:    clamp(1.75rem, 5vh, 2.5rem);
+  padding-bottom: clamp(1.75rem, 5vh, 2.5rem);
+  /* Override page-level translateY animation — children stagger in */
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+/* Когда гость подтвердил приход — таймер уже стоит в confirmed-view,
+   нижний дублирующий «подвал» прячем. */
+body.rsvp-confirmed .page--countdown { display: none; }
+
+.page--countdown .eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.26em;
+  margin: 0 0 1rem;
+  color: var(--brand-soft);
+}
+
+.page--countdown .countdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.page--countdown .countdown-cell {
+  display: grid;
+  gap: 0.35rem;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  padding: 0.25rem 0.2rem;
+}
+
+.page--countdown .countdown-num {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 500;
+  color: var(--text-on-dark);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.page--countdown .countdown-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-on-dark-soft);
+  font-weight: 500;
+}
+
+.page--countdown .countdown-passed {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.2rem, 4vw, 1.75rem);
+  color: var(--brand-soft);
+  margin: 1.25rem 0 0;
+  text-align: center;
+}
+
+/* Stagger reveal — eyebrow → countdown */
+.page--countdown > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 700ms var(--ease),
+    transform 700ms var(--ease);
+}
+.page--countdown.is-visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+.page--countdown.is-visible > *:nth-child(1) { transition-delay: 100ms; }
+.page--countdown.is-visible > *:nth-child(2) { transition-delay: 280ms; }
+.page--countdown.is-visible > *:nth-child(3) { transition-delay: 280ms; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.footer {
+  text-align: center;
+  padding: 3rem var(--pad-x) calc(2rem + env(safe-area-inset-bottom));
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+}
+.footer-couple {
+  font-family: 'BrideScript', 'Pinyon Script', serif;
+  color: var(--text-on-dark);
+  font-size: var(--fs-display);
+  margin: 0 0 0.5rem;
+  line-height: 1;
+}
+.footer-meta {
+  font-size: var(--fs-caption);
+  color: var(--text-on-dark-soft);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ============================================================
+   MUSIC TOGGLE
+   ============================================================ */
+
+.music-toggle {
+  position: fixed;
+  top: calc(0.875rem + env(safe-area-inset-top));
+  right: calc(0.875rem + env(safe-area-inset-right));
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 30;
+  transition: background var(--t-ui) var(--ease), color var(--t-ui) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.music-toggle:hover { color: var(--brand); }
+.music-toggle:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.music-toggle .ico-off { display: none; }
+.music-toggle.is-muted .ico-on  { display: none; }
+.music-toggle.is-muted .ico-off { display: block; }

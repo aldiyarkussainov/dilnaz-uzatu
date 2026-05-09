@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#FBF4EA" />
+  <title>Дильназ — Қыз ұзату · 6 тамыз 2026</title>
+
+  <meta property="og:title" content="Дильназ — Қыз ұзату" />
+  <meta property="og:description" content="Сіздерді аяулы қызымыздың ұзату тойына шақырамыз. 6 тамыз 2026, сағат 17:00, Family Hall, Қосшы." />
+  <meta property="og:type" content="website" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+
+  <!-- Preload splash — short, fades out once the page is ready -->
+  <div class="preload" id="preload" aria-hidden="true">
+    <svg class="preload-heart" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+  </div>
+
+  <!-- Music control (visible from start, muted until user taps) -->
+  <button class="music-toggle is-muted" id="musicToggle" type="button" aria-label="Музыканы қосу/өшіру">
+    <svg class="ico-on" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M9 18V8l11-3v10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="17" cy="15" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    </svg>
+    <svg class="ico-off" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M9 18V8l11-3v10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="6" cy="18" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="17" cy="15" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="3" y1="3" x2="22" y2="22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <audio id="bgMusic" loop preload="auto" playsinline>
+    <source src="assets/music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- ========== 1. COVER (full-bg bride photo + name + date) ========== -->
+  <section class="cover" id="cover" aria-label="Мұқаба">
+    <img class="cover-photo"
+         src="assets/bride.jpg"
+         alt=""
+         aria-hidden="true"
+         onerror="this.style.display='none'" />
+
+    <!-- Decorative double frame — thin cream lines hugging the edges -->
+    <div class="cover-frame" aria-hidden="true"></div>
+
+    <div class="cover-content">
+      <h1 class="cover-name">Дильназ</h1>
+      <p class="cover-subtitle">QYZ UZATU</p>
+    </div>
+
+    <div class="cover-foot">
+      <p class="cover-date">6 тамыз 2026</p>
+      <div class="scroll-cue" id="scrollCue" aria-hidden="true">
+        <span class="scroll-cue-label">төмен қарай</span>
+        <span class="scroll-cue-line"></span>
+      </div>
+    </div>
+  </section>
+
+  <main class="pages" id="pages">
+
+    <!-- ========== 2. GREETING ========== -->
+    <section class="page page--cream page--greeting" data-reveal>
+      <!-- Background falling hearts (populated by script.js) -->
+      <div class="falling-hearts" aria-hidden="true"></div>
+
+      <div class="greeting-top">
+        <p class="eyebrow">Құрметті қонақтар!</p>
+        <p class="lead">Сіздерді аяулы</p>
+      </div>
+
+      <div class="greeting-middle">
+        <h2 class="display-name">Дильназ</h2>
+        <svg class="hero-heart" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <p class="lead">
+          қызымыздың ұзату тойына арналған салтанатты
+          ақ дастарханымыздың қадірлі қонағы болуға шақырамыз.
+        </p>
+      </div>
+
+      <div class="greeting-bottom">
+        <p class="signature">Құрметпен, Той иелері</p>
+        <p class="hosts-names">Қайрат &amp; Айгүл</p>
+      </div>
+    </section>
+
+    <!-- ========== 3. DATE ========== -->
+    <section class="page page--dark page--date" data-reveal>
+      <p class="eyebrow">Той күні</p>
+
+      <div class="calendar" role="img" aria-label="6 тамыз 2026, бейсенбі">
+        <div class="calendar-head">
+          <span>тамыз</span>
+          <span>2026</span>
+        </div>
+        <div class="calendar-dow">
+          <span>дс</span><span>сс</span><span>ср</span><span>бс</span><span>жм</span><span>сб</span><span>жс</span>
+        </div>
+        <div class="calendar-days">
+          <span class="muted"></span><span class="muted"></span><span class="muted"></span><span class="muted"></span><span class="muted"></span><span>1</span><span>2</span>
+          <span>3</span><span>4</span><span>5</span><span class="today">6</span><span>7</span><span>8</span><span>9</span>
+          <span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span>
+          <span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span>
+          <span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span>
+          <span>31</span>
+        </div>
+      </div>
+
+      <div class="time-row">
+        <p class="time-label">Тойдың басталуы</p>
+        <hr class="time-line" />
+        <p class="time-value">16:00</p>
+      </div>
+    </section>
+
+    <!-- ========== 4. VENUE ========== -->
+    <section class="page page--bg page--venue" data-reveal>
+      <!-- Background falling hearts (populated by script.js) -->
+      <div class="falling-hearts" aria-hidden="true"></div>
+
+      <p class="eyebrow">Мекенжайы</p>
+      <h3 class="venue-name">Family Hall</h3>
+      <p class="venue-address">Улица Республики, 3Б, Косшы</p>
+
+      <a class="btn-map"
+         href="https://2gis.kz/astana/geo/70000001095135870"
+         target="_blank"
+         rel="noopener">
+        <svg class="btn-heart" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <span>Қартаға өту</span>
+        <svg class="btn-heart" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </a>
+    </section>
+
+    <!-- ========== 5. RSVP ========== -->
+    <section class="page page--bg page--rsvp" data-reveal>
+      <!-- Background falling hearts (populated by script.js) -->
+      <div class="falling-hearts" aria-hidden="true"></div>
+
+      <!-- Form view (default) -->
+      <div class="rsvp-view" id="rsvpFormView">
+        <p class="eyebrow">Сауалнама</p>
+        <h3 class="rsvp-title">Тойымызға келе аласыз ба?</h3>
+
+        <form class="form" id="rsvpForm" novalidate>
+          <div class="guest-fields" id="guestFields">
+            <label class="field">
+              <span class="field-label">Атыңыз, жөніңіз</span>
+              <input type="text" name="name" autocomplete="name" required placeholder="Мысалы: Әсем Жұмабекова" />
+            </label>
+          </div>
+
+          <button type="button" class="btn-add" id="addGuest">
+            <span class="btn-add-plus" aria-hidden="true">+</span>
+            <span>Тағы қонақ</span>
+          </button>
+
+          <fieldset class="field field--radio">
+            <legend class="field-label">Қатыса аласыз ба?</legend>
+            <label class="radio">
+              <input type="radio" name="attending" value="yes" required />
+              <span>Иә, қуанышпен келемін</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="attending" value="no" />
+              <span>Өкінішке орай, келе алмаймын</span>
+            </label>
+          </fieldset>
+
+          <button type="submit" class="btn-primary" id="submitBtn">Жауап жіберу</button>
+
+          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+
+      <!-- Confirmed view (shown after «Иә, келемін» submitted) -->
+      <div class="rsvp-view" id="rsvpConfirmedView" hidden>
+        <p class="eyebrow">Сізді тойда күтеміз</p>
+        <h3 class="rsvp-title">6 тамыз 2026 · 16:00</h3>
+
+        <div class="countdown countdown--confirm" aria-label="Тойға дейін">
+          <div class="countdown-cell">
+            <span class="countdown-num cd-days">—</span>
+            <span class="countdown-label">күн</span>
+          </div>
+          <div class="countdown-cell">
+            <span class="countdown-num cd-hours">—</span>
+            <span class="countdown-label">сағат</span>
+          </div>
+          <div class="countdown-cell">
+            <span class="countdown-num cd-mins">—</span>
+            <span class="countdown-label">минут</span>
+          </div>
+          <div class="countdown-cell">
+            <span class="countdown-num cd-secs">—</span>
+            <span class="countdown-label">секунд</span>
+          </div>
+        </div>
+
+        <button type="button" class="btn-cancel" id="cancelRsvp">Жауапты алып тастау</button>
+      </div>
+    </section>
+
+    <!-- ========== 6. COUNTDOWN (compact dark footer) ========== -->
+    <section class="page page--dark page--countdown" data-reveal>
+      <p class="eyebrow">Тойға дейін:</p>
+
+      <div class="countdown" id="countdown" aria-label="Тойға дейін қалғаны">
+        <div class="countdown-cell">
+          <span class="countdown-num cd-days" id="cd-days">—</span>
+          <span class="countdown-label">күн</span>
+        </div>
+        <div class="countdown-cell">
+          <span class="countdown-num cd-hours" id="cd-hours">—</span>
+          <span class="countdown-label">сағат</span>
+        </div>
+        <div class="countdown-cell">
+          <span class="countdown-num cd-mins" id="cd-mins">—</span>
+          <span class="countdown-label">минут</span>
+        </div>
+        <div class="countdown-cell">
+          <span class="countdown-num cd-secs" id="cd-secs">—</span>
+          <span class="countdown-label">секунд</span>
+        </div>
+      </div>
+      <p class="countdown-passed" id="countdownPassed" hidden>Той өтті — рақмет, қонақтар!</p>
+    </section>
+
+  </main>
+
+  <script src="assets/script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Админ · Экспорт RSVP</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <style>
+    /* admin-only overrides — same tokens, simpler layout */
+    body { background: var(--bg-soft); }
+    .admin {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: clamp(2rem, 6vw, 3rem) var(--pad-x);
+    }
+    .admin h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: var(--fs-h2);
+      color: var(--ink);
+      font-weight: 500;
+      margin: 0 0 0.5rem;
+    }
+    .admin-sub {
+      color: var(--text-secondary);
+      margin: 0 0 2rem;
+    }
+    .admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    .admin-actions button {
+      appearance: none;
+      font: inherit;
+      font-weight: 500;
+      padding: 0.7rem 1.1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: var(--bg);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: border-color var(--t-ui) var(--ease), background var(--t-ui) var(--ease);
+    }
+    .admin-actions button:hover { border-color: var(--brand); }
+    .admin-actions button.primary {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .admin-actions button.primary:hover { background: #000; }
+    .admin-actions button.danger {
+      color: var(--error);
+      border-color: var(--border-strong);
+    }
+    .admin-actions button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .admin-meta {
+      font-size: var(--fs-caption);
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    .table-wrap {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.7rem 0.875rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      font-size: var(--fs-caption);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 500;
+      background: var(--bg-soft);
+      position: sticky;
+      top: 0;
+    }
+    tbody tr:last-child td { border-bottom: 0; }
+    td.center, th.center { text-align: center; }
+
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: var(--fs-caption);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+    .pill.yes { background: rgba(45, 122, 79, 0.1);  color: var(--success); }
+    .pill.no  { background: rgba(163, 59, 59, 0.08); color: var(--error); }
+
+    .empty {
+      text-align: center;
+      color: var(--text-tertiary);
+      padding: 3rem 1rem;
+      font-size: var(--fs-body);
+    }
+  </style>
+</head>
+<body>
+  <main class="admin">
+    <p class="eyebrow">Админ</p>
+    <h1>Ответы на приглашение</h1>
+    <p class="admin-sub">
+      Эта страница показывает ответы, сохранённые в localStorage этого устройства.
+      Чтобы выгрузить в Excel — нажмите «Скачать .xlsx».
+    </p>
+
+    <div class="admin-actions">
+      <button type="button" class="primary" id="downloadXlsx">Скачать .xlsx</button>
+      <button type="button" id="downloadCsv">Скачать .csv</button>
+      <button type="button" id="copyJson">Копировать JSON</button>
+      <button type="button" class="danger" id="clearAll">Удалить все</button>
+    </div>
+
+    <p class="admin-meta" id="meta"></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Время</th>
+            <th>Имя</th>
+            <th class="center">Придёт</th>
+            <th class="center">Человек</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>Пока нет ответов</div>
+    </div>
+  </main>
+
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script>
+    const STORAGE_KEY = "dilnaz_rsvps";
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+      catch (_) { return []; }
+    }
+
+    function attendingLabel(v) {
+      if (v === "yes") return "Да";
+      if (v === "no")  return "Нет";
+      return v || "—";
+    }
+
+    function fmtTimestamp(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      // Format in Astana time (UTC+5) for readability
+      return d.toLocaleString("ru-RU", {
+        timeZone: "Asia/Almaty",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit",
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+      })[c]);
+    }
+
+    function render() {
+      const data = load();
+      const rows  = document.getElementById("rows");
+      const empty = document.getElementById("empty");
+      const meta  = document.getElementById("meta");
+
+      const yes = data.filter((r) => r.attending === "yes")
+                      .reduce((s, r) => s + (Number(r.guests) || 1), 0);
+      const no  = data.filter((r) => r.attending === "no").length;
+
+      meta.textContent = `Всего: ${data.length} · Придёт: ${yes} человек · Не придёт: ${no}`;
+
+      if (data.length === 0) {
+        rows.innerHTML = "";
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+      rows.innerHTML = data
+        .slice()
+        .sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""))
+        .map((r) => `
+          <tr>
+            <td>${escapeHtml(fmtTimestamp(r.timestamp))}</td>
+            <td>${escapeHtml(r.name)}</td>
+            <td class="center">
+              <span class="pill ${r.attending === "yes" ? "yes" : r.attending === "no" ? "no" : ""}">
+                ${escapeHtml(attendingLabel(r.attending))}
+              </span>
+            </td>
+            <td class="center">${escapeHtml(r.guests)}</td>
+          </tr>
+        `).join("");
+    }
+
+    document.getElementById("downloadXlsx").addEventListener("click", () => {
+      const data = load();
+      if (data.length === 0) return alert("Ответов пока нет");
+      const sheetData = data.map((r) => ({
+        "Время":    fmtTimestamp(r.timestamp),
+        "Имя":      r.name || "",
+        "Придёт":   attendingLabel(r.attending),
+        "Человек":  Number(r.guests) || 1,
+      }));
+      const ws = XLSX.utils.json_to_sheet(sheetData);
+      ws["!cols"] = [
+        { wch: 18 }, { wch: 28 }, { wch: 10 }, { wch: 10 }
+      ];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "RSVP");
+      XLSX.writeFile(wb, `dilnaz-rsvp-${new Date().toISOString().slice(0, 10)}.xlsx`);
+    });
+
+    document.getElementById("downloadCsv").addEventListener("click", () => {
+      const data = load();
+      if (data.length === 0) return alert("Ответов пока нет");
+      const headers = ["Время", "Имя", "Придёт", "Человек"];
+      const escape = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const lines = [
+        headers.join(","),
+        ...data.map((r) => [
+          fmtTimestamp(r.timestamp),
+          r.name,
+          attendingLabel(r.attending),
+          Number(r.guests) || 1,
+        ].map(escape).join(",")),
+      ];
+      // BOM so Excel opens UTF-8 correctly
+      const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `dilnaz-rsvp-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    document.getElementById("copyJson").addEventListener("click", async () => {
+      const data = load();
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+        alert("JSON скопирован");
+      } catch (_) {
+        alert("Не удалось скопировать");
+      }
+    });
+
+    document.getElementById("clearAll").addEventListener("click", () => {
+      if (!confirm("Все ответы будут удалены с этого устройства. Продолжить?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
