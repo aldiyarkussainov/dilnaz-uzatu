@@ -252,9 +252,16 @@
         "Придёт":   attendingLabel(r.attending),
         "Человек":  Number(r.guests) || 1,
       }));
+      const yesTotal = data.filter((r) => r.attending === "yes")
+                           .reduce((s, r) => s + (Number(r.guests) || 1), 0);
       const ws = XLSX.utils.json_to_sheet(sheetData);
+      // Пустая строка-разделитель + строка «Итого придёт» внизу
+      XLSX.utils.sheet_add_aoa(ws, [
+        ["", "", "", ""],
+        ["", "", "Итого придёт", yesTotal],
+      ], { origin: -1 });
       ws["!cols"] = [
-        { wch: 18 }, { wch: 28 }, { wch: 10 }, { wch: 10 }
+        { wch: 18 }, { wch: 28 }, { wch: 14 }, { wch: 10 }
       ];
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "RSVP");
@@ -266,6 +273,8 @@
       if (data.length === 0) return alert("Ответов пока нет");
       const headers = ["Время", "Имя", "Придёт", "Человек"];
       const escape = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const yesTotal = data.filter((r) => r.attending === "yes")
+                           .reduce((s, r) => s + (Number(r.guests) || 1), 0);
       const lines = [
         headers.join(","),
         ...data.map((r) => [
@@ -274,6 +283,9 @@
           attendingLabel(r.attending),
           Number(r.guests) || 1,
         ].map(escape).join(",")),
+        // Пустая строка + строка с итогом «Итого придёт»
+        ["", "", "", ""].map(escape).join(","),
+        ["", "", "Итого придёт", yesTotal].map(escape).join(","),
       ];
       // BOM so Excel opens UTF-8 correctly
       const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
