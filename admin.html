@@ -109,6 +109,25 @@
       padding: 3rem 1rem;
       font-size: var(--fs-body);
     }
+
+    tfoot td {
+      background: var(--bg-soft);
+      font-weight: 600;
+      color: var(--ink);
+      border-top: 2px solid var(--border);
+      border-bottom: 0;
+    }
+    tfoot .total-label {
+      text-align: right;
+      font-size: var(--fs-caption);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    tfoot .total-value {
+      font-size: 1.05rem;
+    }
   </style>
 </head>
 <body>
@@ -140,6 +159,12 @@
           </tr>
         </thead>
         <tbody id="rows"></tbody>
+        <tfoot id="tableFoot" hidden>
+          <tr>
+            <td colspan="3" class="total-label">Итого придёт</td>
+            <td class="center total-value" id="totalGuests">0</td>
+          </tr>
+        </tfoot>
       </table>
       <div class="empty" id="empty" hidden>Пока нет ответов</div>
     </div>
@@ -183,6 +208,8 @@
       const rows  = document.getElementById("rows");
       const empty = document.getElementById("empty");
       const meta  = document.getElementById("meta");
+      const foot  = document.getElementById("tableFoot");
+      const totalEl = document.getElementById("totalGuests");
 
       const yes = data.filter((r) => r.attending === "yes")
                       .reduce((s, r) => s + (Number(r.guests) || 1), 0);
@@ -193,9 +220,12 @@
       if (data.length === 0) {
         rows.innerHTML = "";
         empty.hidden = false;
+        if (foot) foot.hidden = true;
         return;
       }
       empty.hidden = true;
+      if (foot)    foot.hidden = false;
+      if (totalEl) totalEl.textContent = yes;
       rows.innerHTML = data
         .slice()
         .sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""))
