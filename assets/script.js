@@ -104,6 +104,12 @@ if (scrollCue) {
 // не отработает успешно — иначе любая неудачная попытка (например,
 // при выходе preload) сжигала единственный шанс.
 let musicStarted = false;
+
+// Намерение пользователя: true — музыка должна играть, false — выключена
+// вручную. Решает, возобновлять ли трек при возврате на вкладку — если
+// юзер сам отключил музыку, она не должна включиться обратно.
+let wasPlayingBeforeHide = false;
+
 const MUSIC_GESTURE_EVENTS = ["pointerdown", "click", "touchstart", "touchend", "keydown", "wheel"];
 
 function detachMusicGestureListeners() {
@@ -146,11 +152,17 @@ if (musicToggle) {
     musicStarted = true;
     if (audio.paused) {
       audio.play()
-        .then(() => musicToggle.classList.remove("is-muted"))
+        .then(() => {
+          musicToggle.classList.remove("is-muted");
+          // Юзер сам включил музыку — возобновлять при возврате на вкладку.
+          wasPlayingBeforeHide = true;
+        })
         .catch(() => musicToggle.classList.add("is-muted"));
     } else {
       audio.pause();
       musicToggle.classList.add("is-muted");
+      // Юзер сам выключил музыку — не включать её обратно при возврате.
+      wasPlayingBeforeHide = false;
     }
   });
 }
@@ -165,8 +177,8 @@ if (audio) {
 
 /* Авто-пауза музыки когда вкладка/приложение уходят в фон.
    Когда пользователь возвращается — возобновляем, но только
-   если до сворачивания музыка играла (не вручную поставлена на паузу). */
-let wasPlayingBeforeHide = false;
+   если до сворачивания музыка играла (не вручную поставлена на паузу).
+   wasPlayingBeforeHide объявлена выше — там же её обновляет кнопка. */
 
 document.addEventListener("visibilitychange", () => {
   if (!audio) return;
